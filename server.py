@@ -56,8 +56,12 @@ def on_connect_web_route(ws: WebSocketServer):
             turn_off_led()
 
 @server.route("/<path:path>")
-def index(path: str):
+def path(path: str):
     return send_from_directory(static_folder, path)
 
+@server.route("/")
+def index():
+    return send_from_directory(static_folder, "index.html")
+
 if __name__ == "__main__":
-    server.run(port=3000, host="0.0.0.0")
+    server.run()
