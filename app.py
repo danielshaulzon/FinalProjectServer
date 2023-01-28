@@ -1,12 +1,11 @@
-import os
 from flask import Flask, send_from_directory
 from flask_sock import Sock as WebSocket, Server as WebSocketServer
 
 # Create a new flask server.
-server = Flask(__name__)
+app = Flask(__name__)
 # Create a new websocket server.
-websocket = WebSocket(server)
-static_folder = server.static_folder = "static"
+websocket = WebSocket(app)
+static_folder = app.static_folder = "static"
 
 espWS: WebSocketServer | None = None
 webWS: WebSocketServer | None = None
@@ -56,13 +55,13 @@ def on_connect_web_route(ws: WebSocketServer):
         elif message == "led off":
             turn_off_led()
 
-@server.route("/<path:path>")
+@app.route("/<path:path>")
 def path(path: str):
     return send_from_directory(static_folder, path)
 
-@server.route("/")
+@app.route("/")
 def index():
     return send_from_directory(static_folder, "index.html")
 
 if __name__ == "__main__":
-    server.run()
+    app.run()
