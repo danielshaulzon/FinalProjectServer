@@ -64,7 +64,5 @@ def path(path: str):
 def index():
     return send_from_directory(static_folder, "index.html")
 
-port = int(os.environ.get('PORT', 33507))
-
 if __name__ == "__main__":
-    server.run(debug=True, port=port)
+    server.run()
