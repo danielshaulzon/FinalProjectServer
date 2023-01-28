@@ -1,3 +1,4 @@
+import os
 from flask import Flask, send_from_directory
 from flask_sock import Sock as WebSocket, Server as WebSocketServer
 
@@ -63,5 +64,7 @@ def path(path: str):
 def index():
     return send_from_directory(static_folder, "index.html")
 
+port = int(os.environ.get('PORT', 33507))
+
 if __name__ == "__main__":
-    server.run()
+    server.run(debug=True, port=port)
