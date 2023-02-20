@@ -63,5 +63,9 @@ def path(path: str):
 def index():
     return send_from_directory(static_folder, "index.html")
 
-if __name__ == "__main__":
+def create_app():
     app.run()
+
+
+if __name__ == "__main__":
+    create_app()
