@@ -18,12 +18,10 @@ websocket.onmessage = function (event) {
 	}
 };
 
-// When the button is clicked, send a message to the server
-document.getElementById("led-on").onclick = function () {
-	websocket.send("led on");
-};
-
-// When the button is clicked, send a message to the server
-document.getElementById("led-off").onclick = function () {
-	websocket.send("led off");
+document.getElementById("led-toggle").onclick = function () {
+	if (document.body.style.backgroundColor == "red") {
+		websocket.send("led on");
+	} else {
+		websocket.send("led off");
+	}
 };
