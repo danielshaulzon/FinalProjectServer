@@ -7,32 +7,29 @@ app = Flask(__name__)
 CORS(app)
 # Create a new websocket server.
 websocket = WebSocket(app)
-static_folder = app.static_folder = "static"
+app.static_folder = "static"
 
 espWS: WebSocketServer | None = None
 webWS: WebSocketServer | None = None
 
-ledOn = False
+redLedOn = False
+greenLedOn = False
 
-def turn_on_led():
+def turn_on_led(led: str):
     if espWS is not None:
-        espWS.send("led on")
+        espWS.send(f"{led} led on")
 
-def turn_off_led():
+def turn_off_led(led: str):
     if espWS is not None:
-        espWS.send("led off")
+        espWS.send(f"{led} led off")
 
-def led_is_on():
-    global ledOn
-    if webWS is not None:
-        webWS.send("led on")
-        ledOn = True
+def toggle_led(led: str):
+     if espWS is not None:
+        espWS.send(f"{led} led toggle")
 
-def led_is_off():
-    global ledOn
+def notify_web(led: str, state: str):
     if webWS is not None:
-        webWS.send("led off")
-        ledOn = False
+        webWS.send(f"{led} led is {state}")
 
 # Create a new route for the websocket.
 @websocket.route("/esp8266")
@@ -40,19 +37,19 @@ def on_connect_esp8266_route(ws: WebSocketServer):
     """
     This function is called when a new websocket connection is made.
     """
-    global espWS, ledOn
+    global espWS, redLedOn, greenLedOn
     espWS = ws
     while True:
-        message = ws.receive()
-        if message == "button pressed":
-            if ledOn:
-                turn_off_led()
-            else:
-                turn_on_led()
-        elif message == "LED on":
-            led_is_on()
-        elif message == "LED off":
-            led_is_off()
+        message: str = ws.receive()
+        match message.split():
+            case [led, "button", "pressed"]:
+                toggle_led(led)
+            case [led, "led", "turned", state]:
+                notify_web(led, state)
+                if led == "red":
+                    redLedOn = state == "on"
+                elif led == "green":
+                    greenLedOn = state == "on"
 
 @websocket.route("/web")
 def on_connect_web_route(ws: WebSocketServer):
@@ -61,24 +58,30 @@ def on_connect_web_route(ws: WebSocketServer):
     """
     global webWS
     webWS = ws
-    if ledOn:
-        led_is_on()
+    if redLedOn:
+        notify_web("red", "on")
     else:
-        led_is_off()
+        notify_web("red", "off")
+    if greenLedOn:
+        notify_web("green", "on")
+    else:
+        notify_web("green", "off")
     while True:
-        message = ws.receive()
-        if message == "led on":
-            turn_on_led()
-        elif message == "led off":
-            turn_off_led()
+        message: str = ws.receive()
+        match message.split():
+            case ["password", password]:
+                if password == "daniel":
+                    ws.send("password valid")
+            case [led, "led", "toggle"]:
+                toggle_led(led)
 
 @app.route("/<path:path>")
 def path(path: str):
-    return send_from_directory(static_folder, path)
+    return send_from_directory(app.static_folder, path)
 
 @app.route("/")
 def index():
-    return send_from_directory(static_folder, "index.html")
+    return send_from_directory(app.static_folder, "index.html")
 
 def create_app():
     app.run(host="0.0.0.0", port=80)

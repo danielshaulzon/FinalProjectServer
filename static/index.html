@@ -1,10 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Toggle LED</title>
+		<title>Final Project</title>
 		<script src="./index.js" defer></script>
+		<style>
+			* {
+				margin: 0px;
+				padding: 0px;
+			}
+			body {
+				width: 100vw;
+				height: 100vh;
+				display: table;
+  				position: absolute;
+			}
+			div.led {
+				margin: 0px;
+				display: inline-block;
+				width: 50%;
+				height: 100%;
+				text-align: center;
+				display: table-cell;
+				vertical-align: middle;
+			}
+			button {
+				font-size: 20pt;
+				padding: 10px;
+			}
+		</style>
 	</head>
 	<body>
-		<button id="led-toggle">Toggle LED</button>
+		<div id="red-led-div" class="red led">
+			<button id="red-led-toggle" disabled>Toggle red LED</button>
+		</div>
+		<div id="green-led-div" class="green led">
+			<button id="green-led-toggle" disabled>Toggle green LED</button>
+		</div>
 	</body>
 </html>
