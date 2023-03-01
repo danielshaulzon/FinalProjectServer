@@ -1,6 +1,7 @@
 from flask import Flask, send_from_directory
 from flask_sock import Sock as WebSocket, Server as WebSocketServer
 from flask_cors import CORS
+from typing import Union
 
 # Create a new flask server.
 app = Flask(__name__)
@@ -9,8 +10,8 @@ CORS(app)
 websocket = WebSocket(app)
 app.static_folder = "static"
 
-espWS: WebSocketServer | None = None
-webWS: WebSocketServer | None = None
+espWS: Union[WebSocketServer, None] = None
+webWS: Union[WebSocketServer, None] = None
 
 redLedOn = False
 greenLedOn = False
