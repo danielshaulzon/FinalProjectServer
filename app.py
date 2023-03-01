@@ -86,7 +86,7 @@ def path(path: str):
 
 @app.route("/")
 def index():
-    print("test")
+    app.logger.info("test")
     return send_from_directory(app.static_folder, "index.html")
 
 def create_app():
