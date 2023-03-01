@@ -10,8 +10,8 @@ CORS(app)
 websocket = WebSocket(app)
 app.static_folder = "static"
 
-espWS: Union[WebSocketServer, None] = None
-webWS: Union[WebSocketServer, None] = None
+espWS = None
+webWS = None
 
 redLedOn = False
 greenLedOn = False
