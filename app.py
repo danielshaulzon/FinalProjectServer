@@ -42,6 +42,7 @@ def on_connect_esp8266_route(ws: WebSocketServer):
     espWS = ws
     while True:
         message: str = ws.receive()
+        print(f"Got message {message}")
         match message.split():
             case [led, "button", "pressed"]:
                 toggle_led(led)
