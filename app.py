@@ -42,16 +42,18 @@ def on_connect_esp8266_route(ws: WebSocketServer):
     espWS = ws
     while True:
         message: str = ws.receive()
+        split = message.split()
         print(f"Got message {message}")
-        match message.split():
-            case [led, "button", "pressed"]:
-                toggle_led(led)
-            case [led, "led", "turned", state]:
-                notify_web(led, state)
-                if led == "red":
-                    redLedOn = state == "on"
-                elif led == "green":
-                    greenLedOn = state == "on"
+        if split[1:] == ["button", "pressed"]:
+            led = split[0]
+            toggle_led(led)
+        elif split[1:3] == ["led", "turned"]:
+            led, state = split[0], split[3]
+            notify_web(led, state)
+            if led == "red":
+                redLedOn = state == "on"
+            elif led == "green":
+                greenLedOn = state == "on"
 
 @websocket.route("/web")
 def on_connect_web_route(ws: WebSocketServer):
@@ -70,12 +72,13 @@ def on_connect_web_route(ws: WebSocketServer):
         notify_web("green", "off")
     while True:
         message: str = ws.receive()
-        match message.split():
-            case ["password", password]:
-                if password == "daniel":
-                    ws.send("password valid")
-            case [led, "led", "toggle"]:
-                toggle_led(led)
+        split = message.split()
+        if split[0] == ["password"]:
+            if split[1] == "daniel":
+                ws.send("password valid")
+        if split[1:3] == ["led", "toggle"]:
+            led = split[0]
+            toggle_led(led)
 
 @app.route("/<path:path>")
 def path(path: str):
