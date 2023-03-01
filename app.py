@@ -43,17 +43,24 @@ def on_connect_esp8266_route(ws: WebSocketServer):
     while True:
         message: str = ws.receive()
         split = message.split()
-        print(f"Got message {message}")
-        if split[1:] == ["button", "pressed"]:
+        # button pressed
+        if len(split) == 3 and split[1] == "button" and split[2] == "pressed":
             led = split[0]
             toggle_led(led)
-        elif split[1] == "led" and split[2] == "turned":
+        # color changed
+        elif len(split) == 4 and split[1] == "led" and split[2] == "turned":
             led, state = split[0], split[3]
             notify_web(led, state)
             if led == "red":
-                redLedOn = state == "on"
+                if state == "on":
+                    redLedOn = True
+                else:
+                    redLedOn = False
             elif led == "green":
-                greenLedOn = state == "on"
+                if state == "on":
+                    greenLedOn = True
+                else:
+                    greenLedOn = False
 
 @websocket.route("/web")
 def on_connect_web_route(ws: WebSocketServer):
@@ -73,10 +80,9 @@ def on_connect_web_route(ws: WebSocketServer):
     while True:
         message: str = ws.receive()
         split = message.split()
-        if split[0] == "password":
-            if split[1] == "daniel":
-                ws.send("password valid")
-        if split[1] == "led" and split[2] == "toggle":
+        if len(split) == 2 and split[0] == "password" and split[1] == "daniel":
+            ws.send("password valid")
+        if len(split) == 3 and split[1] == "led" and split[2] == "toggle":
             led = split[0]
             toggle_led(led)
 
